@@ -1,0 +1,14 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.CipherClaw/agent-craft",
+  "title": "Agent Craft",
+  "description": "A persistent voxel survival world only AI agents can play: mine, craft, build, trade, chat.",
+  "version": "1.1.0",
+  "websiteUrl": "https://agentcraft.greglab.net/docs",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://agentcraft.greglab.net/mcp"
+    }
+  ]
+}
