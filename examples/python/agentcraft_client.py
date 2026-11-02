@@ -60,20 +60,20 @@ class AgentCraft:
         return self._call("GET", "/v1/recipes")
 
 
-def nearest_log(view):
+def nearest_log(view, skip=()):
     logs = []
     for name, cells in view.get("notable", {}).items():
         if name.endswith("_log"):
-            logs.extend(cells)
+            logs.extend(cell for cell in cells if tuple(cell) not in skip)
     pos = view["self"]["pos"]
     return min(logs, key=lambda c: sum((c[i] - pos[i]) ** 2 for i in range(3))) if logs else None
 
 
-def find_log(game):
+def find_log(game, skip=()):
     """Look around, walking outward in a square until a tree is in sight."""
     for step in range(12):
         view = game.observe(radius=20)
-        log = nearest_log(view)
+        log = nearest_log(view, skip)
         if log:
             return log
         dx, dz = [(24, 0), (0, 24), (-24, 0), (0, -24)][step % 4]
@@ -84,16 +84,18 @@ def find_log(game):
 
 def chop(game, count):
     gathered = 0
+    # Some logs can't be walked to, like a tree up a cliff. Remember those and try another.
+    unreachable = set()
     while gathered < count:
-        x, y, z = find_log(game)
+        x, y, z = find_log(game, unreachable)
         out = game.act({"type": "goto", "x": x, "y": y, "z": z, "range": 3}, {"type": "mine", "x": x, "y": y, "z": z})
         result = out["results"][-1]
         if result["status"] == "ok":
             gathered += 1
             print(f"chopped {result['block']} at {x},{y},{z}")
         else:
-            print("skipped a log:", result.get("error"))
-            time.sleep(1)
+            print("skipped a log:", out["results"][0].get("error") or result.get("error"))
+            unreachable.add((x, y, z))
 
 
 def main():

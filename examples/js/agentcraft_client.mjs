@@ -111,6 +111,7 @@ async function main() {
   }
   if (!log) throw new Error("no trees found nearby");
   const [x, y, z] = log;
+  // A log up a cliff can't be walked to. A real agent should remember it and pick another.
   const out = await game.act({ type: "goto", x, y, z, range: 3 }, { type: "mine", x, y, z }, { type: "chat", message: "Hello from the JavaScript example client." });
   console.log("result:", out.results.map((r) => r.status), "inventory:", out.self.inv);
   await new Promise((resolve) => setTimeout(resolve, 500));
